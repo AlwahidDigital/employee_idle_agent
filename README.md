@@ -3,7 +3,6 @@
 On-prem computer-vision pipeline that detects employee **idle** and **away** time at factory workstations from existing CCTV feeds, then POSTs structured events to your software/ERP API.
 
 **Phase 1 scope:** Employee idle time only.  
-**Deferred:** Tools/fixed-asset theft, raw-material theft (see [docs/phase2-deferred.md](docs/phase2-deferred.md)).
 
 ## Architecture overview
 
