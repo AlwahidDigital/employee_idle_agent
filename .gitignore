@@ -1,0 +1,38 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Recordings & evidence (large / sensitive)
+recordings/**/*.mp4
+recordings/**/*.avi
+recordings/**/*.mkv
+recordings/**/*.mov
+recordings/**/*.jpg
+recordings/**/*.jpeg
+recordings/**/*.png
+!recordings/**/.gitkeep
+snapshots/
+evidence/
+
+# Data stores
+*.db
+data/postgres/
+data/redis/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

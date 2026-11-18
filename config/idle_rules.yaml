@@ -1,0 +1,80 @@
+# Idle / Away state machine — finalized Phase 1 defaults
+# Tune per-zone after pilot recordings calibration (see docs/pilot-recordings.md)
+
+version: "1.0"
+timezone: "Asia/Karachi"
+
+# Tick interval for zone evaluation (seconds)
+evaluation:
+  tick_seconds: 1
+  motion_window_seconds: 3          # average pose/motion over last N seconds
+  person_confidence_min: 0.45
+  debounce_leave_seconds: 5         # ignore brief frame dropouts before AWAY
+
+# Motion / pose activity
+motion:
+  # Below this average joint-displacement / flow score → "low motion"
+  idle_threshold: 0.08
+  # Above this → clearly ACTIVE (hysteresis band between idle and active)
+  active_threshold: 0.12
+  method: "pose_joint_displacement"  # pose_joint_displacement | optical_flow
+
+# Confirm durations before emitting events
+thresholds:
+  idle_confirm_seconds: 180         # 3 minutes low motion → IDLE_STARTED
+  away_confirm_seconds: 300         # 5 minutes no person → AWAY_STARTED
+  escalate_seconds: 900             # 15 minutes → IDLE_ESCALATED / AWAY_ESCALATED
+  end_grace_seconds: 10             # sustained resume before IDLE_ENDED / AWAY_ENDED
+
+# Optional per-zone overrides (empty = use globals)
+# Example:
+# zone_overrides:
+#   ws-assembly-1:
+#     idle_confirm_seconds: 240
+zone_overrides: {}
+
+# Shift calendar — alerts suppressed outside these windows (BREAK state)
+shifts:
+  - id: morning
+    days: [mon, tue, wed, thu, fri, sat]
+    start: "08:00"
+    end: "17:00"
+  # Uncomment if you run a second shift:
+  # - id: evening
+  #   days: [mon, tue, wed, thu, fri, sat]
+  #   start: "17:00"
+  #   end: "01:00"
+
+# Approved breaks inside a shift (no alerts)
+breaks:
+  - id: tea-morning
+    start: "10:30"
+    end: "10:45"
+  - id: lunch
+    start: "13:00"
+    end: "13:45"
+  - id: tea-afternoon
+    start: "15:30"
+    end: "15:45"
+
+# Sundays / holidays: no monitoring (treat as BREAK)
+holidays:
+  # - "2026-12-25"
+  weekly_off: [sun]
+
+# Event types emitted by the state machine
+events:
+  emit:
+    - IDLE_STARTED
+    - IDLE_ESCALATED
+    - IDLE_ENDED
+    - AWAY_STARTED
+    - AWAY_ESCALATED
+    - AWAY_ENDED
+  include_snapshot: true
+  snapshot_from_stream: main        # higher quality for evidence
+
+# Human-in-the-loop: Phase 1 is alert+review, not automatic discipline
+policy:
+  auto_discipline: false
+  require_supervisor_review: true
